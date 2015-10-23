@@ -6,15 +6,15 @@
 
 using namespace std;
 
-void tnpTreeFormat(const char* filename, float lumiForW) {
+void tnpTreeFormat(string path, string filename, float lumiForW) {
 
-  cout << "Formatting " << filename << endl;  
+  cout << "Formatting " << path+filename << endl;  
 
   TFile *fileOrig = 0;
   TTree *treeOrig = 0;
   TH1F  *h_sumW = 0;
   
-  fileOrig = TFile::Open(filename);
+  fileOrig = TFile::Open((path+filename).c_str());
   if( fileOrig ) {
     fileOrig->cd();
     treeOrig = (TTree*)fileOrig->Get("tnpAna/TaPtree");
@@ -64,6 +64,7 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
   vector<int>     *gamma_fullsel  = 0;
   vector<bool>    *gamma_matchMC  = 0;
   vector<bool>    *gamma_kSaturated = 0;
+  vector<float>   *ptRatio    = 0;
   vector<float>   *invMass    = 0;
   vector<float>   *invMassRaw = 0;
   vector<int>     *eleIndex   = 0;
@@ -89,6 +90,7 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
   TBranch        *b_gamma_fullsel; 
   TBranch        *b_gamma_matchMC;
   TBranch        *b_gamma_kSaturated;
+  TBranch        *b_ptRatio; 
   TBranch        *b_invMass; 
   TBranch        *b_invMassRaw; 
   TBranch        *b_eleIndex;  
@@ -113,7 +115,8 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
   treeOrig->SetBranchAddress("gamma_presel", &gamma_presel, &b_gamma_presel);
   treeOrig->SetBranchAddress("gamma_fullsel", &gamma_fullsel, &b_gamma_fullsel);
   treeOrig->SetBranchAddress("gamma_matchMC", &gamma_matchMC, &b_gamma_matchMC);        
-  treeOrig->SetBranchAddress("gamma_kSaturated", &gamma_kSaturated, &b_gamma_kSaturated);        
+  treeOrig->SetBranchAddress("gamma_kSaturated", &gamma_kSaturated, &b_gamma_kSaturated);
+  treeOrig->SetBranchAddress("ptRatio", &ptRatio, &b_ptRatio);
   treeOrig->SetBranchAddress("invMass", &invMass, &b_invMass);
   treeOrig->SetBranchAddress("invMassRaw", &invMassRaw, &b_invMassRaw);
   treeOrig->SetBranchAddress("eleIndex", &eleIndex, &b_eleIndex);
@@ -125,6 +128,7 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
   float probe_pt, probe_absEta;
   int probe_matchMC, probe_kSaturated;
   int probe_fullsel;
+  float pt_ratio;
   float mass;
   float massRaw;
   float xsecWeight, weight;
@@ -146,6 +150,7 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
     theTreeNew->Branch("probe_fullsel", &probe_fullsel, "probe_fullsel/I");
     theTreeNew->Branch("probe_matchMC",&probe_matchMC,"probe_matchMC/I");
     theTreeNew->Branch("probe_kSaturated",&probe_kSaturated,"probe_kSaturated/I");
+    theTreeNew->Branch("pt_ratio", &pt_ratio, "pt_ratio/F");
     theTreeNew->Branch("mass", &mass, "mass/F");
     theTreeNew->Branch("massRaw", &massRaw, "massRaw/F");
     theTreeNew->Branch("xsecWeight", &xsecWeight, "xsecWeight/F");
@@ -160,8 +165,7 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
     for (unsigned int ii=0; ii<invMass->size(); ii++) {
       
       mass = (float)(invMass->at(ii));
-      if (mass<70 || mass>110) continue;
-      // if (mass<60 || mass>4000) continue;
+      if (mass<150) continue;
       
       // further selection on tag 
       if (electron_pt->at(eleIndex->at(ii))<30)     continue;
@@ -172,20 +176,23 @@ void tnpTreeFormat(const char* filename, float lumiForW) {
       if (!gamma_presel->at(gammaIndex->at(ii)))  continue;
 
       // match with mc-truth
-      if (run==1){ 
-	if (!electron_matchMC->at(eleIndex->at(ii))) continue;   
-	if (!gamma_matchMC->at(gammaIndex->at(ii)))  continue;
-      }
-
+      // if (run==1){ 
+      //   if (!electron_matchMC->at(eleIndex->at(ii))) continue;   
+      //   if (!gamma_matchMC->at(gammaIndex->at(ii)))  continue;
+      // }
+      //ciao togli float
       // now making flat tree
+      pt_ratio = (float)(ptRatio->at(ii));
       massRaw = (float)(invMassRaw->at(ii));
       tag_absEta = fabs(electron_eta->at(eleIndex->at(ii)));
       tag_pt = electron_pt->at(eleIndex->at(ii));
-      tag_matchMC = electron_matchMC->at(eleIndex->at(ii));
+      tag_matchMC = 1;
+      //tag_matchMC = electron_matchMC->at(eleIndex->at(ii));
       probe_pt = gamma_pt->at(gammaIndex->at(ii));
       probe_absEta  = fabs(gamma_eta->at(gammaIndex->at(ii)));
       probe_fullsel = gamma_fullsel->at(gammaIndex->at(ii));  
-      probe_matchMC = gamma_matchMC->at(gammaIndex->at(ii));
+      probe_matchMC = 1;
+      //probe_matchMC = gamma_matchMC->at(gammaIndex->at(ii));
       probe_kSaturated = gamma_kSaturated->at(gammaIndex->at(ii));
 
       // weights
