@@ -1,3 +1,4 @@
+
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
 // Mon Oct  5 11:44:26 2015 by ROOT version 6.02/05
@@ -35,6 +36,7 @@ public :
    Int_t           probe_fullsel;
    Int_t           probe_matchMC;
    Int_t           probe_kSaturated;
+   Float_t         pt_ratio;
    Float_t         mass;
    Float_t         massRaw;
    Float_t         xsecWeight;
@@ -54,6 +56,7 @@ public :
    TBranch        *b_probe_fullsel;   //!
    TBranch        *b_probe_matchMC;   //!
    TBranch        *b_probe_kSaturated;   //!
+   TBranch        *b_pt_ratio;   //!
    TBranch        *b_mass;   //!
    TBranch        *b_massRaw;   //!
    TBranch        *b_xsecWeight;   //!
@@ -78,11 +81,11 @@ templateMaker::templateMaker(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/afs/cern.ch/work/c/crovelli/public/TaP_spring15_7412v2/formattedZ/Formatted_DYLL_all__161pb.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/afs/cern.ch/work/f/ffacchin/tagprobe/CMSSW_7_4_15/src/diphotons/fullAnalysisRoma/macro/TandP/Formatted_DYLL_all.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("/afs/cern.ch/work/c/crovelli/public/TaP_spring15_7412v2/formattedZ/Formatted_DYLL_all__161pb.root");
+         f = new TFile("/afs/cern.ch/work/f/ffacchin/tagprobe/CMSSW_7_4_15/src/diphotons/fullAnalysisRoma/macro/TandP/Formatted_DYLL_all.root");
       }
-      TDirectory * dir = (TDirectory*)f->Get("/afs/cern.ch/work/c/crovelli/public/TaP_spring15_7412v2/formattedZ/Formatted_DYLL_all__161pb.root:/tnpAna");
+      TDirectory * dir = (TDirectory*)f->Get("/afs/cern.ch/work/f/ffacchin/tagprobe/CMSSW_7_4_15/src/diphotons/fullAnalysisRoma/macro/TandP/Formatted_DYLL_all.root:/tnpAna");
       dir->GetObject("TaPTree",tree);
 
    }
@@ -143,6 +146,7 @@ void templateMaker::Init(TTree *tree)
    fChain->SetBranchAddress("probe_fullsel", &probe_fullsel, &b_probe_fullsel);
    fChain->SetBranchAddress("probe_matchMC", &probe_matchMC, &b_probe_matchMC);
    fChain->SetBranchAddress("probe_kSaturated", &probe_kSaturated, &b_probe_kSaturated);
+   fChain->SetBranchAddress("pt_ratio", &pt_ratio, &b_pt_ratio);
    fChain->SetBranchAddress("mass", &mass, &b_mass);
    fChain->SetBranchAddress("massRaw", &massRaw, &b_massRaw);
    fChain->SetBranchAddress("xsecWeight", &xsecWeight, &b_xsecWeight);
